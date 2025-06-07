@@ -6,6 +6,7 @@ function Home() {
       <div style={styles.container}>
         <h1 style={styles.heading}>Welcome to Home Page</h1>
         <p style={styles.subtext}>This is your product dashboard. Use the menu to navigate.</p>
+        <a href="https://github.com/DishaPatel126/Tutorial-2" target="_blank" rel="noopener noreferrer">Github Repo Link</a>
       </div>
     </div>
   );
