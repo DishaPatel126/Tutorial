@@ -4,20 +4,35 @@ from flask_cors import CORS
 app = Flask(__name__)
 CORS(app)
 
+# Initial product list
 products = [
-    {"id": 1, "title": "MacBook"}
+    {"id": 1, "title": "MacBook", "quantity": 10}
 ]
 
 @app.route('/api/products', methods=['GET', 'POST'])
 def handle_products():
     if request.method == 'GET':
+        for product in products:
+            if 'quantity' not in product:
+                product['quantity'] = 0
         return jsonify(products)
+
     if request.method == 'POST':
         new_product = request.get_json()
-        if not new_product or 'title' not in new_product:
-            return jsonify({"error": "Title is required"}), 400
-        new_id = products[-1]["id"] + 1 if products else 1
-        new_entry = {"id": new_id, "title": new_product["title"]}
+        if not new_product or 'title' not in new_product or 'id' not in new_product:
+            return jsonify({"error": "id and title are required"}), 400
+
+        quantity = new_product.get('quantity', 0)
+
+        if any(p['id'] == new_product['id'] for p in products):
+            return jsonify({"error": "Product with this ID already exists"}), 409
+
+        new_entry = {
+            "id": new_product['id'],
+            "title": new_product['title'],
+            "quantity": quantity
+        }
+
         products.append(new_entry)
         return jsonify(new_entry), 201
 
@@ -29,10 +44,28 @@ def modify_product(product_id):
 
     if request.method == 'PUT':
         data = request.get_json()
-        if not data or 'title' not in data:
-            return jsonify({"error": "Title is required"}), 400
-        product['title'] = data['title']
-        return jsonify(product)
+        if not data or 'title' not in data or 'id' not in data or 'quantity' not in data:
+            return jsonify({"error": "id, title, and quantity are required"}), 400
+
+        # Check if new ID already exists in a different product
+        if any(p['id'] == data['id'] and p['id'] != product_id for p in products):
+            return jsonify({"error": "Another product with this ID already exists"}), 409
+
+        # Remove the old product
+        products.remove(product)
+
+        # Add the updated product
+        updated_product = {
+            "id": data['id'],
+            "title": data['title'],
+            "quantity": data['quantity']
+        }
+        products.append(updated_product)
+
+        # Optional: sort list by ID for consistent order
+        products.sort(key=lambda p: p['id'])
+
+        return jsonify(updated_product)
 
     if request.method == 'DELETE':
         products.remove(product)
