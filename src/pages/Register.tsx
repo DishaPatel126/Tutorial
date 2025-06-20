@@ -1,29 +1,143 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 function Register() {
-  const [form, setForm] = useState({ name: '', email: '', password: '' });
+  const navigate = useNavigate();
 
-  const handleRegister = async () => {
-    const res = await fetch('http://localhost:5000/api/auth/register', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(form),
-    });
-    const data = await res.json();
-    if (res.ok && data.token) {
-      alert('Registration successful! You can log in now.');
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const [nameError, setNameError] = useState("");
+  const [emailError, setEmailError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+  const [submitError, setSubmitError] = useState("");
+
+  const validateEmail = (value: string) => {
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return regex.test(value);
+  };
+
+  const handleNameBlur = () => {
+    if (!name.trim()) {
+      setNameError("Name is required");
     } else {
-      alert(data.error || 'Registration failed');
+      setNameError("");
+    }
+  };
+
+  const handleEmailBlur = () => {
+    if (!email) {
+      setEmailError("Email is required");
+    } else if (!validateEmail(email)) {
+      setEmailError("Invalid email format");
+    } else {
+      setEmailError("");
+    }
+  };
+
+  const handlePasswordBlur = () => {
+    if (!password) {
+      setPasswordError("Password is required");
+    } else if (password.length < 6) {
+      setPasswordError("Password must be at least 6 characters");
+    } else {
+      setPasswordError("");
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    handleNameBlur();
+    handleEmailBlur();
+    handlePasswordBlur();
+
+    if (
+      nameError ||
+      emailError ||
+      passwordError ||
+      !name ||
+      !email ||
+      !password
+    ) {
+      return;
+    }
+
+    try {
+      const res = await fetch("http://localhost:5000/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, password }),
+      });
+
+      if (res.ok) {
+        navigate("/login");
+      } else {
+        const data = await res.json();
+        setSubmitError(data?.error || "Registration failed.");
+      }
+    } catch {
+      setSubmitError("Server error. Try again.");
     }
   };
 
   return (
-    <div style={{ padding: 20 }}>
-      <h2>Register</h2>
-      <input placeholder="Name" onChange={(e) => setForm({ ...form, name: e.target.value })} /><br />
-      <input placeholder="Email" onChange={(e) => setForm({ ...form, email: e.target.value })} /><br />
-      <input type="password" placeholder="Password" onChange={(e) => setForm({ ...form, password: e.target.value })} /><br />
-      <button onClick={handleRegister}>Register</button>
+    <div
+      className="d-flex justify-content-center align-items-center vh-100"
+      style={{ background: "#f0f2f5" }}
+    >
+      <form
+        onSubmit={handleSubmit}
+        className="border p-4 rounded bg-white shadow"
+        style={{ width: "100%", maxWidth: "400px" }}
+      >
+        <h2 className="mb-4 text-center">Register</h2>
+
+        {submitError && <div className="alert alert-danger">{submitError}</div>}
+
+        <div className="mb-3">
+          <input
+            type="text"
+            className={`form-control ${nameError ? "is-invalid" : ""}`}
+            placeholder="Full Name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            onBlur={handleNameBlur}
+          />
+          {nameError && <div className="invalid-feedback">{nameError}</div>}
+        </div>
+
+        <div className="mb-3">
+          <input
+            type="email"
+            className={`form-control ${emailError ? "is-invalid" : ""}`}
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            onBlur={handleEmailBlur}
+          />
+          {emailError && <div className="invalid-feedback">{emailError}</div>}
+        </div>
+
+        <div className="mb-4">
+          <input
+            type="password"
+            className={`form-control ${passwordError ? "is-invalid" : ""}`}
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            onBlur={handlePasswordBlur}
+          />
+          {passwordError && (
+            <div className="invalid-feedback">{passwordError}</div>
+          )}
+        </div>
+
+        <button type="submit" className="btn btn-success w-100">
+          Register
+        </button>
+      </form>
     </div>
   );
 }

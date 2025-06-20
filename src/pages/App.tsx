@@ -8,6 +8,7 @@ import Login from "./Login";
 import Register from "./Register";
 import { AuthProvider } from "../context/AuthContext";
 import Prods from "./Prods";
+import ProtectedRoute from "./ProtectedRoute";
 
 function App() {
   return (
@@ -15,9 +16,11 @@ function App() {
       <BrowserRouter>
         <Layout />
         <Routes>
-          <Route path="/" element={<Home />} />
+          <Route path="/" element={<Login />} />
           <Route path="/Home" element={<Home />} />
-          <Route path="/AddProduct" element={<AddProduct />} />
+          <Route path="/AddProduct" element={
+            <ProtectedRoute><AddProduct /></ProtectedRoute>
+          } />
           <Route path="/AboutUs" element={<AboutUs />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />

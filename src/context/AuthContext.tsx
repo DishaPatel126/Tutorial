@@ -3,22 +3,34 @@ import type { ReactNode } from 'react';
 
 type AuthContextType = {
   token: string | null;
-  login: (token: string) => void;
+  login: (payload: { email: string; password: string }) => Promise<void>;
   logout: () => void;
 };
 
 const AuthContext = createContext<AuthContextType>({
   token: null,
-  login: () => {},
+  login: async () => {},
   logout: () => {},
 });
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [token, setToken] = useState<string | null>(() => localStorage.getItem('token'));
 
-  const login = (newToken: string) => {
-    setToken(newToken);
-    localStorage.setItem('token', newToken);
+  const login = async ({ email, password }: { email: string; password: string }) => {
+    const res = await fetch("http://localhost:5000/api/auth/login", {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    });
+
+    const data = await res.json();
+
+    if (res.ok) {
+      setToken(data.token);
+      localStorage.setItem('token', data.token);
+    } else {
+      throw new Error(data.error || 'Login failed');
+    }
   };
 
   const logout = () => {
