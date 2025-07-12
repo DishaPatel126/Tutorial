@@ -12,6 +12,7 @@ function Register() {
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [submitError, setSubmitError] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
 
   const validateEmail = (value: string) => {
     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -72,6 +73,8 @@ function Register() {
       });
 
       if (res.ok) {
+        setSuccessMessage("Registration successful! Redirecting to login...");
+        setTimeout(() => navigate("/login"), 2000); // Redirect after 2s
         navigate("/login");
       } else {
         const data = await res.json();
@@ -95,6 +98,7 @@ function Register() {
         <h2 className="mb-4 text-center">Register</h2>
 
         {submitError && <div className="alert alert-danger">{submitError}</div>}
+        {successMessage && (<div className="alert alert-success">{successMessage}</div>)}
 
         <div className="mb-3">
           <input
