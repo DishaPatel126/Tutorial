@@ -44,6 +44,11 @@ def token_required(f):
         return f(*args, **kwargs)
     return decorated
 
+
+@app.route("/")
+def index():
+    return "Backend running", 200
+
 # ----------------- AUTH ROUTES --------------------
 @app.route("/api/auth/register", methods=["POST"])
 def register():
