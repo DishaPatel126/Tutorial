@@ -40,8 +40,8 @@ function AddProduct() {
 
     const url =
       editingId !== null
-        ? `http://localhost:5000/api/products/${editingId}`
-        : "http://localhost:5000/api/products";
+        ? `${baseUrl}/api/products/${editingId}`
+        : `${baseUrl}/api/products`;
 
     const method = editingId !== null ? "PUT" : "POST";
 
@@ -87,7 +87,7 @@ function AddProduct() {
     if (!window.confirm("Are you sure you want to delete this product?"))
       return;
 
-    fetch(`http://localhost:5000/api/products/${id}`, {
+    fetch(`${baseUrl}/api/products/${id}`, {
       method: "DELETE",
       headers: {
         Authorization: `Bearer ${token}`
