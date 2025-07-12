@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 
@@ -12,6 +12,7 @@ function Prods() {
   const { token, logout } = useAuth();
   const [products, setProducts] = useState<Product[]>([]);
   const navigate = useNavigate();
+  const baseUrl = import.meta.env.VITE_API_URL;
 
   useEffect(() => {
     if (!token) {
@@ -19,7 +20,7 @@ function Prods() {
       return;
     }
 
-    fetch("http://localhost:5000/api/products", {
+    fetch(`${baseUrl}/api/products`, {
       headers: { Authorization: `Bearer ${token}` }
     })
       .then(res => res.json())

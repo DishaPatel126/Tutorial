@@ -1,4 +1,3 @@
-import React from "react";
 import { useState, useEffect } from "react";
 
 type Product = {
@@ -8,9 +7,10 @@ type Product = {
 
 function ProductDummy() {
   const [data, setData] = useState<Product[]>([]);
+  const baseUrl = import.meta.env.VITE_API_URL;
 
   useEffect(() => {
-    fetch("http://localhost:5000/api/products")
+    fetch(`${baseUrl}/api/products`)
       .then((res) => res.json())
       .then((data) => setData(data))
       .catch((err) => console.error("Fetch error", err));

@@ -15,9 +15,10 @@ function AddProduct() {
   const [title, setTitle] = useState("");
   const [quantity, setQuantity] = useState("");
   const [editingId, setEditingId] = useState<number | null>(null);
+  const baseUrl = import.meta.env.VITE_API_URL;
 
   const fetchProducts = () => {
-    fetch("http://localhost:5000/api/products", {
+    fetch(`${baseUrl}/api/products`, {
       headers: {
         Authorization: `Bearer ${token}`
       }
